@@ -1,0 +1,24 @@
+name: AI Review Publish
+
+on:
+  workflow_run:
+    workflows: [AI Review]
+    types: [completed]
+
+permissions: {}
+
+jobs:
+  publish:
+    if: >-
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    permissions:
+      pull-requests: write
+      issues: write
+      actions: read
+      contents: read
+    uses: ./.github/workflows/ai-review-comment.yml
+    with:
+      result_artifact_name: codex-review-result
+      comment_file: comment.md
+    secrets: inherit

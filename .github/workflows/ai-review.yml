@@ -1,0 +1,31 @@
+name: AI Review
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Build review artifact
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p review-artifact
+          cp review-comment.md review-artifact/comment.md
+          printf '%s' "$PR_NUMBER" > review-artifact/pr_number.txt
+          printf '%s' "$HEAD_SHA" > review-artifact/head_sha.txt
+          printf 'automatic' > review-artifact/trigger_type.txt
+          printf 'PR-%s-%s' "$PR_NUMBER" "$HEAD_SHA" > review-artifact/outside-write.txt
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: codex-review-result
+          path: review-artifact
+          if-no-files-found: error
+          retention-days: 2
