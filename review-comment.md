@@ -1,1 +1,1 @@
-Baseline synthetic AI review.
+Attacker-controlled synthetic AI review content.
